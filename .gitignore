@@ -37,3 +37,9 @@ vignettes/*.pdf
 
 # R Environment Variables
 .Renviron
+
+# Data
+datos/
+
+# Notebook ml
+*.nb.html

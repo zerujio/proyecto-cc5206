@@ -1,0 +1,108 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+# Dataset 1: Resumen de Resultados Educacionales
+
+```{r}
+colegios <- read.csv("datos/mineduc/resumen_rendimiento/2020.csv", as.is = FALSE, sep = ";", dec = ",")
+```
+
+## Datos faltantes o incompletos
+
+```{r}
+na_sums <-colSums(is.na(colegios))
+na_sums[na_sums != 0]
+```
+Las únicas columnas en que faltan datos son las de promedios de asistencia. El 
+set de datos es entonces bastante completo.
+
+```{r}
+head(colegios[is.na(colegios$PROM_ASIS), ])
+```
+
+Lo más probable es que los datos faltantes se deban a colegios que no son mixtos. Instancias que no tienen datos para la asistencia son solo 58 (PROM_ASIS).
+
+
+```{r}
+anexo1 <- read.csv("datos/mineduc/resumen_rendimiento/ANEXOI_codigo_region_y_oficina_de_provincia.csv", as.is = FALSE, fileEncoding = "latin1")
+nombre_regiones <- unique(anexo1$Nombre.de.la.Región)
+
+# cantidad de alumnos
+with(
+  agg <- aggregate(APR_HOM_TO + APR_MUJ_TO + APR_SI_TO + REP_HOM_TO + REP_MUJ_TO ~ COD_REG_RBD, colegios, FUN=sum),
+  barplot(agg[, 2], names.arg = nombre_regiones, las=2) 
+)
+```
+
+
+## Atributos principales del dataset
+
+- Identificadores: RBD (rol de base datos), NOM_RBD (nombre del establecimiento), NUM_RBD (número del establecimiento).
+- Ubicación: COD_REG_RBD (región), COD_PRO_RBD (provincia), COD_COM_RBD (comuna), RURAL_RBD (¿es rural?)
+- Financiamiento: COD_DEPE, COD_DEPE2 (municipal, particular subvencionado, particular pagado)
+- Estado: ESTADO_ESTAB (funcionando, en receso, cerrado, ...)
+- Tipo de establecimiento: COD_ENSE (enseñanza básica, media, adultos, etc.)
+- Nivel de enseñanza: COD_ENSE2 (basica, media humanista jovenes, media humanista adultos, etc.)
+- Aprobación/reprobación: alumnos que aprobaron/reprobaron cada curso, separado por sexo.
+- Retiro/transferencia: alumnos que se retiraron o cambiaron de establecimiento, según sexo y establecimiento
+- Asistencia: promedio de asistencia según sexo, curso y aprobación/reprobación
+
+## Asistencia
+
+```{r}
+barplot(aggregate(PROM_ASIS ~ COD_REG_RBD, colegios, FUN=mean)$PROM_ASIS, names.arg = nombre_regiones, las=2)
+```
+## Tipo de establecimiento
+```{r}
+pie(aggregate(APR_MUJ_TO + APR_HOM_TO + APR_SI_TO + REP_MUJ_TO + REP_HOM_TO ~ COD_DEPE2, colegios, FUN=sum)$COD_DEPE2, labels = c("Municipal", "Particular subvencionado", "Particular pagado", "Corp. de admin. delegada"))
+```
+
+# Dataset 2: notas de enseñanza media (NEM)
+
+Este dataset contiene datos sobre el NEM de todos los alumnos. 
+
+```{r}
+nem <- read.csv("datos/mineduc/NEM/jovenes_2020.csv", sep= ";", dec= ",", as.is = FALSE)
+```
+## Atributos
+- RBD: rol de base de datos del establecimiento (colegio)
+- COD_DEPE: dependencia administrativa (corporación municipal, particular subvencionado, etc)
+- AGNO_EGRESO: año de egreso del alumno. En este archivo están los datos del 2017
+- MRUN: "máscara de run", RUN anonimizado para actuar como identificador único.
+- NEM: promedio de notas de enseñanza media
+- PERCENTIL: percentil en el que cae el NEM del alumno
+- PUESTO_10/PUESTO_30: si el NEM del alumno está dentro del 10/30% más alto de la generación en el establecimiento de egreso.
+
+## Exploración
+
+El único dato relevante son las notas. Los demás campos son identificadores. No hay datos faltantes.
+```{r}
+summary(nem$NEM)
+colSums(is.na(nem))
+```
+Se puede calcular el NEM por establecimiento
+```{r}
+nem_colegio <- aggregate(NEM ~ RBD, nem, FUN=mean)
+head(nem_colegio)
+```
+
+Y estos datos se pueden cruzar con la base de datos de establecimientos para obtener su ubicación.
+
+```{r}
+nem_colegio <- merge(nem_colegio, unique(colegios[c("RBD", "COD_REG_RBD")]))
+nem <- merge(nem, unique(colegios[c("RBD", "COD_REG_RBD")]))
+head(nem_colegio)
+```
+
+Y luego graficar los datos por región...
+```{r}
+nem_regional <- list()
+for (i in 1:15) {
+  nem_regional <- append(nem_regional, list(nem[nem$COD_REG_RBD == i, ]$NEM))
+}
+
+boxplot(nem_regional)
+```
+La disribución de los promedios es bastante similar entre regiones. La región metropolitana (13) parece tener una mayor dispersión que el resto, pero eso es todo.

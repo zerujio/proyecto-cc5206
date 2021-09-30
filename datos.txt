@@ -1,0 +1,16 @@
+Datasets escogidos:
+
+Rendimiento escolar en Chile
+https://www.kaggle.com/rpparada/rendimiento-escolar-chile
+
+NEM:
+http://datos.mineduc.cl/dashboards/20389/descarga-de-base-de-datos-notas-de-ensenanza-media-y-percentil-en-jovenes/
+
+Datos del INE
+https://www.ine.cl/estadisticas/
+
+- Encuesta Suplementaria de Ingresos:
+https://www.ine.cl/estadisticas/sociales/ingresos-y-gastos/encuesta-suplementaria-de-ingresos
+
+En INE.stat hay cuadros resumen de los datos de la ESI
+https://stat.ine.cl/Index.aspx
