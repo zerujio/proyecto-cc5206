@@ -129,6 +129,11 @@ ymed
 # Datos consolidados: colegios
 
 ```{r}
-
+cons <- merge(
+  colegios[(colegios$COD_ENSE2 == 5) | (colegios$COD_ENSE2 == 7), ],# media jovenes
+  nem_colegio[,1:2]
+)
+colnames(cons)
+head(cons)
 ```
 

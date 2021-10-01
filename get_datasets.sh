@@ -18,3 +18,6 @@ download_data http://datos.mineduc.cl/datasets/195396-resumen-rendimiento-ano-20
 
 # NEM
 download_data http://datos.mineduc.cl/datasets/195848-nem-y-percentil-jovenes-ano-2020.download/ jovenes_2020.csv $DIR_MINEDUC/NEM/
+
+# Rendimiento académico
+download_data http://datos.mineduc.cl/datasets/195065-rendimiento-escolar-ano-2020.download/ 2020.zip $DIR_MINEDUC/rendimiento_escolar

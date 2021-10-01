@@ -1,0 +1,41 @@
+# Base de datos de rendimiento académico (MINEDUC)
+
+```{r}
+rendimiento <- read.csv("datos/mineduc/rendimiento_escolar/2020.csv", sep = ";",
+                        dec = ",", as.is = FALSE, 
+                        colClasses = c(
+                          rep("integer", 3), #AGNO, RBD, DGV_RBD
+                          rep("factor", 19), #NOM_RBD a COD_DES_CUR
+                          "numeric", # MRUN
+                          "factor", #GEN_ALU
+                          "integer", #FEC_NAC_ALU
+                          "integer", #EDAD_ALU
+                          rep("factor", 6), #COD_REG_ALU a COD_ESPE
+                          rep("numeric", 2), #PROM_GRAL, ASISTENCIA
+                          rep("factor", 3)#SIT_FIN;SIT_FIN_R;COD_MEN
+                        ))
+# decodificación
+levels(rendimiento$GEN_ALU) <- c("S/I", "HOMBRE", "MUJER")
+levels(rendimiento$RURAL_RBD) <- c("URBANO", "RURAL")
+levels(rendimiento$COD_DEPE) <- c("CORP_MUNICIPAL", 
+                                  "MUNICIPAL_DAEM", 
+                                  "PARTICULAR_SUB",
+                                  "PARTICULAR_PAGADO",
+                                  "CORP_ADMIN_DELEGADA", 
+                                  "SERV_LOCAL_EDUCACION")
+levels(rendimiento$ESTADO_ESTAB) <- c("FUNCIONANDO", 
+                                      "RECESO", 
+                                      "CERRADO", 
+                                      "AUTORIZADO_SIN_MATRICULA")
+levels(rendimiento$SIT_FIN) <- c("SIN_INFO", "PROMOVIDO", "REPROBADO", "RETIRADO")
+levels(rendimiento$SIT_FIN_R) <- c(levels(rendimiento$SIT_FIN), "TRASLADADO")
+summary(rendimiento)
+```
+Principales atributos:
+- Datos del alumno: curso, edad, género, % asistencia, promedio general.
+- Datos del establecimiento: nombre, región, provincia, comuna, tipo (humanista-científico, técnico-profesional, etc.), administración (municipal, particular subvencionado, etc), ruralidad.
+
+```{r} 
+```
+
+ 
