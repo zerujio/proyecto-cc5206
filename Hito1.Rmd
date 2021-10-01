@@ -1,0 +1,148 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+setwd("C:/Users/Diego/Documents/Bibliografia2021-2/IntroALaMineria/Proyecto")
+getwd()
+```
+```{r}
+getwd()
+tabla <- read.csv("Rendimiento2020.csv", as.is = FALSE, sep = ";", dec = ",")
+```
+### Exploración básica
+
+1. ¿Cuáles son las dimensiones del dataset (filas, columnas)?.
+```{r}
+getwd()
+dim(tabla)
+```
+2. ¿Qué describe cada línea del dataset? 
+
+```{r}
+str(tabla)
+```
+Veamos una instancia en particular para comentar el significado de cada atributos
+
+```{r}
+tabla[3,]
+```
+
+
+Consultas
+- Ver si dos colegios con el mismo numero tienen el mismo nombre
+- Ver frecuencia de cada region NOM_REG_RBD_A
+- Ver la frecuencia de colegios segun su codigo de dependencia COD_DEPE
+
+Resumen estadisticas de dataset
+```{r}
+summary(tabla)
+```
+Del sumario anterior se obtiene la siguiente información
+
+Hay 3164534 estudiantes en esta base de datos
+
+La escuela con un mayor número de alumnos registrados es la Escuela España con 5964 estudiantes
+
+El código de región varía entre 1 y 16, luego todas las regiones son representadas en este dataset
+
+Las regiones con más representación en termino de estudiantes son
+RM          :1213896  
+Valparaiso  : 320846    
+BioBio      : 276417      
+Maule       : 190252    
+Araucania   : 184490     
+LGBO        : 169713  (Libertador General Bernardo O'Higgins)
+
+Las comunas con el mayor número de estudiantes son: NOM_COD_RBD
+Puente Alto :  94860  
+Maipú       :  86580  
+Santiago    :  78530  
+Antofagasta :  70326  
+La Florida  :  67802  
+Temuco      :  59422 
+
+Las provincias con más representación en término del número de estudiantes son : NO_DEPROV_RBD
+Santiago Poniente : 219411   
+Santiago Oriente  : 209317    
+Cordillera        : 199300   
+Santiago Sur      : 189527   
+Valparaiso        : 175961    
+Santiago Norte    : 174838
+
+Comunas con mayor número de estudiantes residentes son: NOM_COM_ALU
+Puente Alto  :  106080  
+Maipú        :  91020  
+Antofagasta  :  74512  
+La Florida   :  63181  
+San Bernardo :  58906  
+Viña Del Mar :  55713 
+
+
+El promedio del promedio general es un 5,7 y la mediana es un 6.2, el 50% de los alumnos
+tiene un promedio general entre 5.4 y 6.7
+
+La asistencia promedio es de 89.51%, la mediana es un 96% y el 50% de los alumnos
+tiene una asistencia entre 85% y 100%
+
+El 94,4% de los estudiantes es promovido
+El 1,8% de los estudiantes es reprobado
+El 1% de los estudiantes es retirado
+El 2,61% de los estudiantes son trasladados
+
+```{r}
+length(unique(tabla$COD_PRO_RBD))
+```
+
+De una fuente externa se obtiene que Chile cuenta con 56 provincias, luego se concluye que toda provincia está representada en este dataset
+
+```{r}
+length(unique(tabla$COD_COM_RBD))
+```
+El dataset representa 345 comunas, Chile tiene 346, luego solo una comuna del pais no cuenta con establecimientos educacionales representados
+
+```{r}
+length(unique(tabla$RBD))
+```
+De una fuente externa se obtiene que Chile cuenta con alrededor de 12000 establecimientos educacionales, de los cuales 9040 se ven representados en este dataset
+
+```{r}
+library(tidyverse)
+grupos_region <- tabla %>% group_by(NOM_REG_RBD_A)
+grupos_region
+```
+El promedio general por region
+```{r}
+promreg <- grupos_region %>% summarise(
+  prom = mean(PROM_GRAL)
+)
+promreg[order(promreg$prom, decreasing = TRUE),]
+```
+Con lo cual observamos que la región con el mayor promedio general es la Región de Magallanes con un 6.0 mientras que región con menor promedio general es la Región de Los Lagos con 5.7
+Y el promedio a asistencia de cada region
+
+```{r}
+asistreg <- grupos_region %>% summarise(
+  asist = mean(ASISTENCIA)
+)
+asistreg[order(asistreg$asist, decreasing = TRUE),]
+```
+Top establecimientos según promedio general
+```{r}
+grupos_establecimiento <- tabla %>% group_by(NOM_RBD)
+grupos_establecimiento
+
+```
+```{r}
+promcol <- grupos_establecimiento %>% summarise(
+  prom = mean(PROM_GRAL)
+)
+promcol[order(promcol$prom, decreasing = TRUE),]
+
+```
+Arriba agrega numero de estudiantes 

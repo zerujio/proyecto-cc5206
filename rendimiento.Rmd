@@ -19,17 +19,16 @@ levels(rendimiento$GEN_ALU) <- c("S/I", "HOMBRE", "MUJER")
 levels(rendimiento$RURAL_RBD) <- c("URBANO", "RURAL")
 levels(rendimiento$COD_DEPE) <- c("CORP_MUNICIPAL", 
                                   "MUNICIPAL_DAEM", 
-                                  "PARTICULAR_SUB",
+                                  "PARTICULAR_SUBVEN",
                                   "PARTICULAR_PAGADO",
-                                  "CORP_ADMIN_DELEGADA", 
-                                  "SERV_LOCAL_EDUCACION")
+                                  "CORP_ADMIN_DELEGD", 
+                                  "SERVI_LOCAL_EDUCA")
 levels(rendimiento$ESTADO_ESTAB) <- c("FUNCIONANDO", 
                                       "RECESO", 
                                       "CERRADO", 
-                                      "AUTORIZADO_SIN_MATRICULA")
+                                      "AUTO_SIN_MAT")
 levels(rendimiento$SIT_FIN) <- c("SIN_INFO", "PROMOVIDO", "REPROBADO", "RETIRADO")
 levels(rendimiento$SIT_FIN_R) <- c(levels(rendimiento$SIT_FIN), "TRASLADADO")
-summary(rendimiento)
 ```
 Principales atributos:
 - Datos del alumno: curso, edad, género, % asistencia, promedio general.
