@@ -106,3 +106,29 @@ for (i in 1:15) {
 boxplot(nem_regional)
 ```
 La disribución de los promedios es bastante similar entre regiones. La región metropolitana (13) parece tener una mayor dispersión que el resto, pero eso es todo.
+
+# Anexo: ingreso mediano de la ocupación, por provincia
+
+```{r}
+ymedraw <- read.csv("datos/INE/ESI_YMEDIANO_OCU.csv")
+ymed <- ymedraw[c("DTI_CL_PROVINCIA", "Provincia", "Value")]
+colnames(ymed) <- c("COD_PRO_RBD", "NOM_PRO", "Y_MED")
+# quitar prefijo
+ymed[,1] <- substring(ymed[,1], 4)
+# separar ultima linea en dos
+ymed <- rbind(ymed, ymed[ymed$COD_PRO_RBD == "102_104",])
+ymed[nrow(ymed) - 1, "COD_PRO_RBD"] = "102"
+ymed[nrow(ymed), "COD_PRO_RBD"] = "104"
+# convertir a int
+ymed$COD_PRO_RBD <- strtoi(ymed$COD_PRO_RBD, base = 10)
+
+ymed
+```
+
+
+# Datos consolidados: colegios
+
+```{r}
+
+```
+
