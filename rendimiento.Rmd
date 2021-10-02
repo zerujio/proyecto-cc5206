@@ -4,8 +4,8 @@
 rendimiento <- read.csv("datos/mineduc/rendimiento_escolar/2020.csv", sep = ";",
                         dec = ",", as.is = FALSE, 
                         colClasses = c(
-                          rep("integer", 3), #AGNO, RBD, DGV_RBD
-                          rep("factor", 19), #NOM_RBD a COD_DES_CUR
+                          "integer",
+                          rep("factor", 21), #NOM_RBD a COD_DES_CUR
                           "numeric", # MRUN
                           "factor", #GEN_ALU
                           "integer", #FEC_NAC_ALU
@@ -35,6 +35,7 @@ Principales atributos:
 - Datos del establecimiento: nombre, región, provincia, comuna, tipo (humanista-científico, técnico-profesional, etc.), administración (municipal, particular subvencionado, etc), ruralidad.
 
 ```{r} 
+summary(rendimiento)
 ```
 
  

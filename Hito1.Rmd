@@ -8,12 +8,12 @@ This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute
 Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
 
 ```{r}
-setwd("C:/Users/Diego/Documents/Bibliografia2021-2/IntroALaMineria/Proyecto")
-getwd()
+#setwd("C:/Users/Diego/Documents/Bibliografia2021-2/IntroALaMineria/Proyecto")
+#getwd()
 ```
 ```{r}
-getwd()
-tabla <- read.csv("Rendimiento2020.csv", as.is = FALSE, sep = ";", dec = ",")
+#getwd()
+tabla <- read.csv("datos/mineduc/rendimiento_escolar/2020.csv", as.is = FALSE, sep = ";", dec = ",")
 ```
 ### Exploración básica
 

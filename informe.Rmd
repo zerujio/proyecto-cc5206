@@ -1,1 +1,194 @@
+---
+title: "Informe Hito 1"
+output: html_notebook
+---
+
+# Introducción
+
+# Exploración de datos
+
+```{r setup}
+# ajustar ubicación del archivo!!
+datos_raw <- read.csv("datos/mineduc/rendimiento_escolar/2020.csv", sep = ";",
+                        dec = ",", as.is = FALSE, 
+                        colClasses = c(
+                          "integer",
+                          rep("factor", 21), #NOM_RBD a COD_DES_CUR
+                          "numeric", # MRUN
+                          "factor", #GEN_ALU
+                          "integer", #FEC_NAC_ALU
+                          "integer", #EDAD_ALU
+                          rep("factor", 6), #COD_REG_ALU a COD_ESPE
+                          rep("numeric", 2), #PROM_GRAL, ASISTENCIA
+                          rep("factor", 3)#SIT_FIN;SIT_FIN_R;COD_MEN
+                        ))
+```
+
+
+```{r}
+# decodificación
+datos <- datos_raw
+
+levels(datos$GEN_ALU) <- c("S/I", "HOMBRE", "MUJER")
+
+levels(datos$RURAL_RBD) <- c("URBANO", "RURAL")
+
+levels(datos$COD_DEPE) <- c("CORP_MUNICIPAL", 
+                            "MUNICIPAL_DAEM", 
+                            "PARTICULAR_SUBVEN",
+                            "PARTICULAR_PAGADO",
+                            "CORP_ADMIN_DELEGD", 
+                            "SERVI_LOCAL_EDUCA")
+
+levels(datos$ESTADO_ESTAB) <- c("FUNCIONANDO", 
+                                "RECESO", 
+                                "CERRADO", 
+                                "AUTO_SIN_MAT")
+
+levels(datos$SIT_FIN) <- c("SIN_INFO", "PROMOVIDO", "REPROBADO", "RETIRADO")
+
+levels(datos$SIT_FIN_R) <- c(levels(datos$SIT_FIN), "TRASLADADO")
+```
+El dataset abarca más de 3 millones de alumnos.
+
+Datos generales:
+```{r}
+# dimensiones
+dim(datos)
+# atributos
+colnames(datos)
+```
+Si bien hay muchas columnas, los datos que estas proveen pueden ser agrupados en menos categorías:
+- Identificación del alumno: edad, género, y lugar de residencia
+- Rendimiento del alumno: curso, promedio general y porcentaje de asistencia
+- Identificación del colegio: identificador único (RBD), ubicación, administración (municipal, particular subvencionado, etc.).
+- Tipo de enseñanza: técnico-profesional, científico-humanista, para adultos, etc.
+
+## Completitud
+```{r}
+# Provincias
+length(unique(datos$COD_PRO_RBD))
+# Comunas
+length(unique(datos$COD_COM_RBD))
+# Establecimientos
+length(unique(datos$RBD))
+```
+Chile tiene 56 provincias y 346 comunas, es decir, hay una sola comuna para la cual no hay ningún establecimiento en los datos. Todo el resto del territorio debiese estar representado.
+
+De una [fuente externa](https://www.bcn.cl/siit/estadisticasterritoriales//resultados-consulta?id=82491) se obtiene que en Chile existen 11342 establecimientos educacionales, de los cuales 9040 están presentes en los datos. No está claro por qué estos establecimientos están ausentes, pero es probable que sean aquellos con menor cantidad de estudiantes. En general, el dataset parece ser bastante completo.
+
+## Datos faltantes
+```{r}
+colSums(is.na(datos))
+```
+Aparentemente existen sólo datos faltantes en la columna de edad. Esto se debe a que las otras columnas son factores, y los datos faltantes pueden estar codificados de otro forma (como un string vacío, o un espacio en blanco).
+
+```{r}
+# situacion final desconocida
+sum(datos$SIT_FIN_R == "SIN_INFO")
+
+# sin info de género
+sum(datos$GEN_ALU == "S/I")
+
+# sin edad
+sum(is.na(datos$EDAD_ALU))
+
+# sin info de edad
+
+# sin info de lugar de residencia
+ sum(datos$COD_REG_ALU == "0" | datos$COD_COM_ALU == "0")
  
+ # alumnos retirados (promedio 0,0)
+ sum(datos$PROM_GRAL == 0.0)
+```
+Hay pocos datos faltantes. La categoría más significativa son los alumnos retirados, cuyo promedio está ingresado como 0,0. Todos estos casos pueden ser retirados del dataset.
+
+```{r}
+datos <- subset(datos, !is.na(EDAD_ALU) & PROM_GRAL != 0 & GEN_ALU != "S/I" & COD_REG_ALU != "0" & COD_COM_ALU != "0")
+
+# remove factors not present
+for (fct in  c("GEN_ALU", "COD_REG_ALU", "COD_COM_ALU", "SIT_FIN", "SIT_FIN_R")) {
+  datos[, fct] <- factor(datos[, fct])
+}
+datos$COD_COM_RBD <- factor(datos$COD_COM_RBD, levels = levels(datos$COD_COM_ALU))
+```
+
+
+## Distribución
+
+```{r}
+plot(datos$NOM_REG_RBD_A)
+```
+Como es esperable, la mayoría de los alumnos se concentran en la región metropolitana. Las regiones de Valparaíso y Bio Bio son las que mayor cantidad de alumnos tienen sin contar la metropolitana, mientras que Aysen y Magallanes tienen la menor cantidad.
+
+```{r}
+pie(table(datos$RURAL_RBD))
+```
+Así mismo, la gran mayoría de los estudiantes se encuentran en zonas urbanas.
+
+```{r}
+pie(table(datos$COD_DEPE))
+```
+Alrededor de la mitad de los estudiantes asiste a colegios particulares subvencionados. 
+
+```{r}
+sum(is.na(datos$EDAD_ALU))
+length(datos[datos$EDAD_ALU == 0.0,]$EDAD_ALU)
+```
+
+
+```{r}
+boxplot(PROM_GRAL ~ RURAL_RBD, datos) 
+boxplot(PROM_GRAL ~ COD_DEPE, datos)
+boxplot(PROM_GRAL ~ GEN_ALU, datos)
+boxplot(PROM_GRAL ~ NOM_REG_RBD_A, datos)
+boxplot(PROM_GRAL ~ COD_ENSE2, datos)
+```
+En general la distribución de las notas es bastante uniforme. Las notas en areas rurales son ligeramente inferiores a las areas urbanas. Por género, las mujeres tienen notas levemente superiores. Por región, sólo Magallanes parece tener una distribución notablemente diferente al resto, tendiendo a ser mejor. La edad de los alumnos también es similar por región, por lo que los promedios son comparables.
+
+Un criterio que arroja diferencias claras es el tipo de establecimiento, donde se observa una jerarquía con los colegios particulares pagados arriba, los sobvencionados en medio y los municipales abajo. El otro criterio es el nivel de enseñanza: los códigos 3, 6 y 8, que corresponden a educación para adultos, tienen una varianza mucho mayor y un promedio más bajo que la educación para jóvenes. Además, dentro de la educación para jóvenes se ve que la enseñanza técnico profesional tienen promedios más bajos que la humanistico científica.
+
+Puesto que los datos de adultos tienen tanta varianza, se puede repetir el análisis considerando únicamente a los jóvenes.
+
+```{r}
+cod_ense <- c("110", "210", "310", "410", "510", "610", "710", "810", "910")
+jovenes <- datos[is.element(datos$COD_ENSE, cod_ense),]
+jovenes$COD_ENSE <- factor(jovenes$COD_ENSE)
+
+boxplot(PROM_GRAL ~ RURAL_RBD, jovenes) 
+boxplot(PROM_GRAL ~ COD_DEPE, jovenes)
+boxplot(PROM_GRAL ~ GEN_ALU, jovenes)
+boxplot(PROM_GRAL ~ NOM_REG_RBD_A, jovenes)
+boxplot(PROM_GRAL ~ COD_ENSE, jovenes)
+
+# educacion básica
+basica <- jovenes[jovenes$COD_ENSE == "110", ]
+boxplot(PROM_GRAL ~ COD_GRADO, basica)
+
+# educación media
+media <- jovenes[is.element(jovenes$COD_ENSE, cod_ense[2:length(cod_ense)]),]
+media$COD_GRADO <- factor(media$COD_GRADO)
+media$COD_ENSE <- factor(media$COD_ENSE)
+boxplot(PROM_GRAL ~ COD_GRADO, media)
+```
+Como es de esperarse dado los jóvenes son la mayoría de los estudiantes, la tendencia general se mantiene. En el caso de los promedios por región, sin embargo, las diferencias se hacen más evidentes. Observando los promedios por curso se observa que tiende a descender en los cursos superiores, pero en la media la tendencia es la inversa.
+
+Este análisis no revela patrones demasiado evidentes. De todos modos, puesto que los colegios no necesariamente evalúan con el mismo estándar de notas, no está claro que tan comparables son las notas de alumnos que asisten a colegios distintos. En este sentio, podría ser útil hacer comparaciones entre alumnos del mismo colegio. Por ejemplo: comparar resultados de alumnos que estudian en la misma comuna donde viven con los de alumnos que estudian en colegios de otras comunas.
+
+```{r}
+with(jovenes, 
+     {
+       jovenes$MISMA_COM <- (jovenes$COD_COM_RBD == jovenes$COD_COM_ALU)
+       boxplot(PROM_GRAL ~ MISMA_COM, jovenes)
+       print(sum(jovenes$MISMA_COM))
+       print(sum(!jovenes$MISMA_COM))
+     })
+```
+El promedio general de quienes estudian en la misma comuna en la que viven parece ser un poco mayor, aunque la cantidad de alumnos en esta categoría es tres veces mayor a quienes estudian en comunas diferentes.
+
+# Preguntas y problemas
+```{r}
+
+```
+
+
