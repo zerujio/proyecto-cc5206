@@ -117,7 +117,9 @@ datos$COD_COM_RBD <- factor(datos$COD_COM_RBD, levels = levels(datos$COD_COM_ALU
 ## Distribución
 
 ```{r}
-plot(datos$NOM_REG_RBD_A)
+summary(datos$NOM_REG_RBD_A)
+Regiones = c("Antofagasta", "Araucanía", "Atacama", "Arica y Parinacota", "Aysén", "Biobío","Coquimbo", "Los Lagos", "O'higgins", "Magallanes", "Maule", "Ñuble", "Los Ríos", "RM", "Tarapacá", "Valparaíso")
+plot(datos$NOM_REG_RBD_A, main = "Distribución de estudiantes", xlab = "Región", ylab = "Cantidad")
 ```
 Como es esperable, la mayoría de los alumnos se concentran en la región metropolitana. Las regiones de Valparaíso y Bio Bio son las que mayor cantidad de alumnos tienen sin contar la metropolitana, mientras que Aysen y Magallanes tienen la menor cantidad.
 
@@ -127,9 +129,28 @@ pie(table(datos$RURAL_RBD))
 Así mismo, la gran mayoría de los estudiantes se encuentran en zonas urbanas.
 
 ```{r}
-pie(table(datos$COD_DEPE))
+pielabel = c("Corp. Municipal", "Municipal DAEM", "Particular Subvencionado", "Particular Pagado", "Corp. Administración Delegada", "Serv. Local de Educación")
+pct <- round(summary(datos$COD_DEPE)/sum(summary(datos$COD_DEPE))*100)
+pielabel<-paste(pielabel, pct)
+pielabel<-paste(pielabel, "%",sep="")
+pie(table(datos$COD_DEPE), labels = pielabel, main = "Tipos de establecimientos", )
 ```
-Alrededor de la mitad de los estudiantes asiste a colegios particulares subvencionados. 
+Alrededor de la mitad de los estudiantes en Chile asiste a colegios particulares subvencionados. El servicio local de educación corresponde a un 3%, mientras que la corporación administración delegada corresponde al 1% del tipo de establecimientos del país.
+
+```{r}
+testab<-datos
+testab$COD_DEPE <-testab$COD_DEPE %>% str_replace_all(., "MUNICIPAL_DAEM", "MUNICIPAL")
+testab$COD_DEPE <-testab$COD_DEPE %>% str_replace_all(., "CORP_MUNICIPAL", "MUNICIPAL")
+testab$COD_DEPE <-testab$COD_DEPE %>% str_replace_all(., "SERVI_LOCAL_EDUCA", "OTROS")
+testab$COD_DEPE <-testab$COD_DEPE %>% str_replace_all(., "CORP_ADMIN_DELEGD", "OTROS")
+pielabel = c("Municipal", "Otros", "Particular Subvencionado", "Particular Pagado")
+pct <- round(summary(factor(testab$COD_DEPE))/sum(summary(datos$COD_DEPE))*100)
+pielabel<-paste(pielabel, pct)
+pielabel<-paste(pielabel, "%",sep="")
+pie(table(testab$COD_DEPE), labels = pielabel, main = "Tipos de establecimientos")
+```
+Esta visualización representa una forma más sencilla y común de ver la distribución de los tipos de establecimientos en Chile. Cabe notar que la diferencia entre los establecimientos administrados por corporaciones municipales y DAEM recae en el marco legislativo, por lo que agrupar ambas categorías no es un error, sino una simplificación.
+
 
 ```{r}
 sum(is.na(datos$EDAD_ALU))
@@ -138,11 +159,11 @@ length(datos[datos$EDAD_ALU == 0.0,]$EDAD_ALU)
 
 
 ```{r}
-boxplot(PROM_GRAL ~ RURAL_RBD, datos) 
-boxplot(PROM_GRAL ~ COD_DEPE, datos)
-boxplot(PROM_GRAL ~ GEN_ALU, datos)
-boxplot(PROM_GRAL ~ NOM_REG_RBD_A, datos)
-boxplot(PROM_GRAL ~ COD_ENSE2, datos)
+boxplot(PROM_GRAL ~ RURAL_RBD, datos, ylab = "Promedio General", xlab = "Zona") 
+boxplot(PROM_GRAL ~ COD_DEPE, datos, ylab = "Promedio General", xlab = "Tipo de establecimiento")
+boxplot(PROM_GRAL ~ GEN_ALU, datos, ylab = "Promedio General", xlab = "Género")
+boxplot(PROM_GRAL ~ NOM_REG_RBD_A, datos, ylab = "Promedio General", xlab = "Región")
+boxplot(PROM_GRAL ~ COD_ENSE2, datos, ylab = "Promedio General", xlab = "Código de enseñanza")
 ```
 En general la distribución de las notas es bastante uniforme. Las notas en areas rurales son ligeramente inferiores a las areas urbanas. Por género, las mujeres tienen notas levemente superiores. Por región, sólo Magallanes parece tener una distribución notablemente diferente al resto, tendiendo a ser mejor. La edad de los alumnos también es similar por región, por lo que los promedios son comparables.
 
@@ -155,23 +176,23 @@ cod_ense <- c("110", "210", "310", "410", "510", "610", "710", "810", "910")
 jovenes <- datos[is.element(datos$COD_ENSE, cod_ense),]
 jovenes$COD_ENSE <- factor(jovenes$COD_ENSE)
 
-boxplot(PROM_GRAL ~ RURAL_RBD, jovenes) 
-boxplot(PROM_GRAL ~ COD_DEPE, jovenes)
-boxplot(PROM_GRAL ~ GEN_ALU, jovenes)
-boxplot(PROM_GRAL ~ NOM_REG_RBD_A, jovenes)
-boxplot(PROM_GRAL ~ COD_ENSE, jovenes)
+boxplot(PROM_GRAL ~ RURAL_RBD, jovenes, main = "Jóvenes", ylab = "Promedio General", xlab = "Zona") 
+boxplot(PROM_GRAL ~ COD_DEPE, jovenes, main = "Jóvenes", ylab = "Promedio General", xlab = "Tipo de establecimiento")
+boxplot(PROM_GRAL ~ GEN_ALU, jovenes, main = "Jóvenes", ylab = "Promedio General", xlab = "Género")
+boxplot(PROM_GRAL ~ NOM_REG_RBD_A, jovenes, main = "Jóvenes", ylab = "Promedio General", xlab = "Región")
+boxplot(PROM_GRAL ~ COD_ENSE, jovenes, main = "Jóvenes", ylab = "Promedio General")
 
 # educacion básica
 basica <- jovenes[jovenes$COD_ENSE == "110", ]
-boxplot(PROM_GRAL ~ COD_GRADO, basica)
+boxplot(PROM_GRAL ~ COD_GRADO, basica, main = "Enseñanza Básica", ylab = "Promedio General", xlab = "Nivel/Curso")
 
 # educación media
 media <- jovenes[is.element(jovenes$COD_ENSE, cod_ense[2:length(cod_ense)]),]
 media$COD_GRADO <- factor(media$COD_GRADO)
 media$COD_ENSE <- factor(media$COD_ENSE)
-boxplot(PROM_GRAL ~ COD_GRADO, media)
+boxplot(PROM_GRAL ~ COD_GRADO, media, main = "Enseñanza Media", ylab = "Promedio General", xlab = "Nivel/Curso")
 ```
-Como es de esperarse dado los jóvenes son la mayoría de los estudiantes, la tendencia general se mantiene. En el caso de los promedios por región, sin embargo, las diferencias se hacen más evidentes. Observando los promedios por curso se observa que tiende a descender en los cursos superiores, pero en la media la tendencia es la inversa.
+Como es de esperarse dado los jóvenes son la mayoría de los estudiantes, la tendencia general se mantienen, con la excepción en el caso de los promedios por región, donde las diferencias se hacen más evidentes. Observando los promedios por curso se observa que tiende a descender en los cursos superiores, pero en la media la tendencia es la inversa.
 
 Este análisis no revela patrones demasiado evidentes. De todos modos, puesto que los colegios no necesariamente evalúan con el mismo estándar de notas, no está claro que tan comparables son las notas de alumnos que asisten a colegios distintos. En este sentio, podría ser útil hacer comparaciones entre alumnos del mismo colegio. Por ejemplo: comparar resultados de alumnos que estudian en la misma comuna donde viven con los de alumnos que estudian en colegios de otras comunas.
 
@@ -179,7 +200,7 @@ Este análisis no revela patrones demasiado evidentes. De todos modos, puesto qu
 with(jovenes, 
      {
        jovenes$MISMA_COM <- (jovenes$COD_COM_RBD == jovenes$COD_COM_ALU)
-       boxplot(PROM_GRAL ~ MISMA_COM, jovenes)
+       boxplot(PROM_GRAL ~ MISMA_COM, jovenes, main = "Comuna de estudio", ylab = "Promedio General", xlab = "¿El estudiante vive en la misma comuna en que estudia?")
        print(sum(jovenes$MISMA_COM))
        print(sum(!jovenes$MISMA_COM))
      })
