@@ -3,7 +3,15 @@ title: "Informe Hito 1"
 output: html_notebook
 ---
 
+Integrantes: 
+  - Matías Donoso
+  - Sergio Morales
+  - Diego Ruiz
+
 # Introducción
+
+El siguiente informa abarca estudios en torno a la educación primaria y secundaria en Chile, y tiene como principal objetivo caracterizar la relación entre el promedio general y distintas variables, como la condición de ruralidad, región geográfica, género, tipo de dependencia. Estas variables están presentes en el mismo dataset otorgado por el MINEDUC, que contiene gran información acerda de tres millones de estudiantes. Las principales hipótesis, que también son motivaciones para estudiar relaciones entre las variables, son la existencia de una fuerte relación entre el promedio general de los alumnos de distintos establecimientos y su género, zona demográfica, región geográfica y tipo de establecimiento.
+El informe contiene análisis y síntesis de distintas observaciones en torno a los estudios y visualizaciones del comportamiento de estas variables.
 
 # Exploración de datos
 
@@ -124,7 +132,11 @@ plot(datos$NOM_REG_RBD_A, main = "Distribución de estudiantes", xlab = "Región
 Como es esperable, la mayoría de los alumnos se concentran en la región metropolitana. Las regiones de Valparaíso y Bio Bio son las que mayor cantidad de alumnos tienen sin contar la metropolitana, mientras que Aysen y Magallanes tienen la menor cantidad.
 
 ```{r}
-pie(table(datos$RURAL_RBD))
+pielabel = c("Urbana", "Rural")
+pct <- round(summary(factor(datos$RURAL_RBD))/sum(summary(datos$RURAL_RBD))*100)
+pielabel<-paste(pielabel, pct)
+pielabel<-paste(pielabel, "%",sep="")
+pie(table(datos$RURAL_RBD), labels = pielabel, main = "Zona")
 ```
 Así mismo, la gran mayoría de los estudiantes se encuentran en zonas urbanas.
 
@@ -143,13 +155,20 @@ testab$COD_DEPE <-testab$COD_DEPE %>% str_replace_all(., "MUNICIPAL_DAEM", "MUNI
 testab$COD_DEPE <-testab$COD_DEPE %>% str_replace_all(., "CORP_MUNICIPAL", "MUNICIPAL")
 testab$COD_DEPE <-testab$COD_DEPE %>% str_replace_all(., "SERVI_LOCAL_EDUCA", "OTROS")
 testab$COD_DEPE <-testab$COD_DEPE %>% str_replace_all(., "CORP_ADMIN_DELEGD", "OTROS")
-pielabel = c("Municipal", "Otros", "Particular Subvencionado", "Particular Pagado")
+pielabel = c("Municipal", "Otros", "Particular Pagado", "Particular Subvencionado")
 pct <- round(summary(factor(testab$COD_DEPE))/sum(summary(datos$COD_DEPE))*100)
 pielabel<-paste(pielabel, pct)
 pielabel<-paste(pielabel, "%",sep="")
 pie(table(testab$COD_DEPE), labels = pielabel, main = "Tipos de establecimientos")
 ```
 Esta visualización representa una forma más sencilla y común de ver la distribución de los tipos de establecimientos en Chile. Cabe notar que la diferencia entre los establecimientos administrados por corporaciones municipales y DAEM recae en el marco legislativo, por lo que agrupar ambas categorías no es un error, sino una simplificación.
+
+
+```{r}
+sum(is.na(datos$EDAD_ALU))
+length(datos[datos$EDAD_ALU == 0.0,]$EDAD_ALU)
+```
+
 
 ```{r}
 boxplot(PROM_GRAL ~ RURAL_RBD, datos, ylab = "Promedio General", xlab = "Zona") 
@@ -189,6 +208,7 @@ Como es de esperarse dado los jóvenes son la mayoría de los estudiantes, la te
 
 Este análisis no revela patrones demasiado evidentes. De todos modos, puesto que los colegios no necesariamente evalúan con el mismo estándar de notas, no está claro que tan comparables son las notas de alumnos que asisten a colegios distintos. En este sentio, podría ser útil hacer comparaciones entre alumnos del mismo colegio. Por ejemplo: comparar resultados de alumnos que estudian en la misma comuna donde viven con los de alumnos que estudian en colegios de otras comunas.
 
+
 ```{r}
 with(jovenes, 
      {
@@ -200,14 +220,12 @@ with(jovenes,
 ```
 El promedio general de quienes estudian en la misma comuna en la que viven parece ser un poco mayor, aunque la cantidad de alumnos en esta categoría es tres veces mayor a quienes estudian en comunas diferentes.
 
-```{r}
-cor(jovenes$PROM_GRAL, jovenes$ASISTENCIA)
-```
-Finalmente, se observa que no hay correlación entre asistencia y promedio.
-
-
 # Preguntas y problemas
 
 Al examinar el dataset se hace evidente que muchas variables no tienen el poder predictivo que se esperaba. Las diferencias más marcadas se dan en relación a la ubicación geográfica y el código de dependencia. Creemos que esto se debe a que los sistemas de evaluación utilizados por los colegios no están estandarizados mucho más allá de la escala de notas y los contenidos a pasar. Hay una multiplicidad de variables que afectan la forma en que los colegios evalúan a sus alumnos, por lo que las notas son poco comparables entre alumnos de colegios distintos. En consecuencia, es evidente que es necesario añadir datos que sean comparables entre colegios, o bien, derivar tales variables a partir de los atributos ya existentes. Por ejemplo, se puede considerar la distribución de notas de los colegios y tomar en cuenta la posición del alumno en relación a sus compañeros. 
 
 Es necesario, entonces, buscar relaciones más complejas entre las variables. Al comparar promedios una variable a la vez se hace difícil observar tendencias. Por tanto, nos interesa utilizar algoritmos de clustering para determinar si existen combinaciones de variables que generen grupos de alumnos con rendimiento escolar similar. En general, del análisis de datos como los resultados de la PSU se observa que en Chile existe esta segregación, y nos interesa determinar si es posible identificarlos con los datos disponibles en este dataset.
+
+
+
+
