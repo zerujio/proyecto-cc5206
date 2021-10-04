@@ -151,13 +151,6 @@ pie(table(testab$COD_DEPE), labels = pielabel, main = "Tipos de establecimientos
 ```
 Esta visualización representa una forma más sencilla y común de ver la distribución de los tipos de establecimientos en Chile. Cabe notar que la diferencia entre los establecimientos administrados por corporaciones municipales y DAEM recae en el marco legislativo, por lo que agrupar ambas categorías no es un error, sino una simplificación.
 
-
-```{r}
-sum(is.na(datos$EDAD_ALU))
-length(datos[datos$EDAD_ALU == 0.0,]$EDAD_ALU)
-```
-
-
 ```{r}
 boxplot(PROM_GRAL ~ RURAL_RBD, datos, ylab = "Promedio General", xlab = "Zona") 
 boxplot(PROM_GRAL ~ COD_DEPE, datos, ylab = "Promedio General", xlab = "Tipo de establecimiento")
@@ -207,9 +200,14 @@ with(jovenes,
 ```
 El promedio general de quienes estudian en la misma comuna en la que viven parece ser un poco mayor, aunque la cantidad de alumnos en esta categoría es tres veces mayor a quienes estudian en comunas diferentes.
 
-# Preguntas y problemas
 ```{r}
-
+cor(jovenes$PROM_GRAL, jovenes$ASISTENCIA)
 ```
+Finalmente, se observa que no hay correlación entre asistencia y promedio.
 
 
+# Preguntas y problemas
+
+Al examinar el dataset se hace evidente que muchas variables no tienen el poder predictivo que se esperaba. Las diferencias más marcadas se dan en relación a la ubicación geográfica y el código de dependencia. Creemos que esto se debe a que los sistemas de evaluación utilizados por los colegios no están estandarizados mucho más allá de la escala de notas y los contenidos a pasar. Hay una multiplicidad de variables que afectan la forma en que los colegios evalúan a sus alumnos, por lo que las notas son poco comparables entre alumnos de colegios distintos. En consecuencia, es evidente que es necesario añadir datos que sean comparables entre colegios, o bien, derivar tales variables a partir de los atributos ya existentes. Por ejemplo, se puede considerar la distribución de notas de los colegios y tomar en cuenta la posición del alumno en relación a sus compañeros. 
+
+Es necesario, entonces, buscar relaciones más complejas entre las variables. Al comparar promedios una variable a la vez se hace difícil observar tendencias. Por tanto, nos interesa utilizar algoritmos de clustering para determinar si existen combinaciones de variables que generen grupos de alumnos con rendimiento escolar similar. En general, del análisis de datos como los resultados de la PSU se observa que en Chile existe esta segregación, y nos interesa determinar si es posible identificarlos con los datos disponibles en este dataset.
