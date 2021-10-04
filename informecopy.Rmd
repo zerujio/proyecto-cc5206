@@ -3,7 +3,15 @@ title: "Informe Hito 1"
 output: html_notebook
 ---
 
+Integrantes: 
+  - Matías Donoso
+  - Sergio Morales
+  - Diego Ruiz
+
 # Introducción
+
+El siguiente informa abarca estudios en torno a la educación primaria y secundaria en Chile, y tiene como principal objetivo caracterizar la relación entre el promedio general y distintas variables, como la condición de ruralidad, región geográfica, género, tipo de dependencia. Estas variables están presentes en el mismo dataset otorgado por el MINEDUC, que contiene gran información acerda de tres millones de estudiantes. Las principales hipótesis, que también son motivaciones para estudiar relaciones entre las variables, son la existencia de una fuerte relación entre el promedio general de los alumnos de distintos establecimientos y su género, zona demográfica, región geográfica y tipo de establecimiento.
+El informe contiene análisis y síntesis de distintas observaciones en torno a los estudios y visualizaciones del comportamiento de estas variables.
 
 # Exploración de datos
 
@@ -199,6 +207,14 @@ boxplot(PROM_GRAL ~ COD_GRADO, media, main = "Enseñanza Media", ylab = "Promedi
 Como es de esperarse dado los jóvenes son la mayoría de los estudiantes, la tendencia general se mantienen, con la excepción en el caso de los promedios por región, donde las diferencias se hacen más evidentes. Observando los promedios por curso se observa que tiende a descender en los cursos superiores, pero en la media la tendencia es la inversa.
 
 Este análisis no revela patrones demasiado evidentes. De todos modos, puesto que los colegios no necesariamente evalúan con el mismo estándar de notas, no está claro que tan comparables son las notas de alumnos que asisten a colegios distintos. En este sentio, podría ser útil hacer comparaciones entre alumnos del mismo colegio. Por ejemplo: comparar resultados de alumnos que estudian en la misma comuna donde viven con los de alumnos que estudian en colegios de otras comunas.
+
+```{r}
+grupos_establecimiento <- testab %>% group_by(NOM_RBD)
+promcol <- grupos_establecimiento %>% summarise(
+  prom = sd(PROM_GRAL)
+)
+promcol[order(promcol$prom, decreasing = TRUE),]
+```
 
 ```{r}
 with(jovenes, 
