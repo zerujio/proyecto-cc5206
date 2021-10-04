@@ -8,8 +8,6 @@ output: html_notebook
 # Exploración de datos
 
 ```{r setup}
-library(tidyverse)
-
 # ajustar ubicación del archivo!!
 datos_raw <- read.csv("datos/mineduc/rendimiento_escolar/2020.csv", sep = ";",
                         dec = ",", as.is = FALSE, 
@@ -208,12 +206,6 @@ with(jovenes,
      })
 ```
 El promedio general de quienes estudian en la misma comuna en la que viven parece ser un poco mayor, aunque la cantidad de alumnos en esta categoría es tres veces mayor a quienes estudian en comunas diferentes.
-
-```{r}
-cor(datos$PROM_GRAL, datos$ASISTENCIA)
-```
-Finalmente, se puede estudiar si hay una relación directa entre el porcentaje de asistencia y el promedio final. Al calcular la correlación el coeficiente obtendio es de 0.4; no hay relación observable.
-
 
 # Preguntas y problemas
 ```{r}
