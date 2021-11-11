@@ -21,3 +21,6 @@ download_data http://datos.mineduc.cl/datasets/195848-nem-y-percentil-jovenes-an
 
 # Rendimiento académico
 download_data http://datos.mineduc.cl/datasets/195065-rendimiento-escolar-ano-2020.download/ 2020.zip $DIR_MINEDUC/rendimiento_escolar
+
+# Prueba de transición
+download_data http://datos.mineduc.cl/datasets/196340-prueba-de-transicion-universitaria-2021-inscritos-puntajes.download/ inscritos_2021.csv $DIR_MINEDUC/PDT

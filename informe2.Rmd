@@ -1,5 +1,5 @@
 ---
-title: "Informe Hito 1"
+title: "Informe Hito 2"
 output:
   html_document:
     df_print: paged
@@ -230,5 +230,42 @@ Al examinar el dataset se hace evidente que muchas variables no tienen el poder 
 Es necesario, entonces, buscar relaciones más complejas entre las variables. Al comparar promedios una variable a la vez se hace difícil observar tendencias. Por tanto, nos interesa utilizar algoritmos de clustering para determinar si existen combinaciones de variables que generen grupos de alumnos con rendimiento escolar similar. En general, del análisis de datos como los resultados de la PSU se observa que en Chile existe esta segregación, y nos interesa determinar si es posible identificarlos con los datos disponibles en este dataset.
 
 
+
+# Hito 2
+
+## Exploración
+### Resultados PDT
+```{r}
+pdt = read.csv("datos/mineduc/PDT/inscritos_2021.csv", sep=";", dec=",", as.is = F, 
+               colClasses = c(COD_SEXO="factor", 
+                              RBD="factor", 
+                              CODIGO_ENS="factor", 
+                              LOCAL_EDUCACIONAL="factor", 
+                              UNIDAD_EDUCATIVA="factor", 
+                              DEPENDENCIA= "factor", 
+                              CODIGO_REGION_EGRESO="factor", 
+                              CODIGO_PROVINCIA_EGRESO="factor", 
+                              CODIGO_COMUNA_EGRESO="factor", 
+                              PUNTAJES_PROCESO="factor", 
+                              TIPO_RENDICION="factor", 
+                              FORMA_CL="factor", 
+                              FORMA_MATE="factor", 
+                              FORMA_HCS="factor", 
+                              FORMA_CBIO="factor", 
+                              FORMA_CFIS="factor", 
+                              FORMA_CQUI="factor", 
+                              FORMA_CTP="factor"))
+```
+
+Se puede intentar cruzar los datos con los de rendimiento en el colegio.
+
+```{r}
+pdt_merged = merge(datos, pdt, by.x = c("MRUN", "RBD"), by.y = c("MRUN", "RBD"))
+nrow(pdt_merged)
+colnames(pdt_merged)
+
+cor(pdt_merged[c("PROM_GRAL", "PROMEDIO_NOTAS", "PTJE_NEM", "PTJE_RANKING", "CLEC_ACTUAL", "MATE_ACTUAL")], use="complete.obs")
+```
+`PROM_GRAL` es el promedio de notas del año de egreso. `PROMEDIO_NOTAS` es el promedio de notas de enseñanza media. El `PTJE_NEM` y el `PTJE_RANKING` también son funciones de las notas de eneñanza media ajustados por factores como el grupo educacional de ingreso. Es de esperarse que estás estén altamente correlacionadas. `CLEC_ACTUAL` es el puntaje obtenido en la prueba de lenguaje, mientras que `MATE_ACTUAL` es el puntaje obtenido en la de matemáticas. De las variables derivadas del promedio de notas,  `PROMEDIO_NOTAS` presenta la correlación más alta con los puntajes de lenguaje y matemáticas: 0.53 y 0.5, respectivamente.
 
 
