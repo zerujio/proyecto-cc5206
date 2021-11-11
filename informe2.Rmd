@@ -262,10 +262,15 @@ Se puede intentar cruzar los datos con los de rendimiento en el colegio.
 ```{r}
 pdt_merged = merge(datos, pdt, by.x = c("MRUN", "RBD"), by.y = c("MRUN", "RBD"))
 nrow(pdt_merged)
-colnames(pdt_merged)
 
 cor(pdt_merged[c("PROM_GRAL", "PROMEDIO_NOTAS", "PTJE_NEM", "PTJE_RANKING", "CLEC_ACTUAL", "MATE_ACTUAL")], use="complete.obs")
 ```
 `PROM_GRAL` es el promedio de notas del año de egreso. `PROMEDIO_NOTAS` es el promedio de notas de enseñanza media. El `PTJE_NEM` y el `PTJE_RANKING` también son funciones de las notas de eneñanza media ajustados por factores como el grupo educacional de ingreso. Es de esperarse que estás estén altamente correlacionadas. `CLEC_ACTUAL` es el puntaje obtenido en la prueba de lenguaje, mientras que `MATE_ACTUAL` es el puntaje obtenido en la de matemáticas. De las variables derivadas del promedio de notas,  `PROMEDIO_NOTAS` presenta la correlación más alta con los puntajes de lenguaje y matemáticas: 0.53 y 0.5, respectivamente.
 
+```{r}
+levels(pdt_merged$DEPENDENCIA) <- c("", "Corp. Muni.", "Municipal", "Part. Subv.", "Part. Pagado", "Corp. Adm. Del.", "SLE")
 
+boxplot(CLEC_ACTUAL ~ DEPENDENCIA, pdt_merged)
+boxplot(MATE_ACTUAL ~ DEPENDENCIA, pdt_merged)
+```
+Los puntajes de los alumnos que egresaron de colegios particulares pagados están muy notablemente por encima de los demás-
