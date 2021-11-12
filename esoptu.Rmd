@@ -1,0 +1,445 @@
+---
+title: "esopsu"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## EXPLORACIÓN DATOS PSU
+
+```{r}
+ws = "/Users/catalaxis/Documents/Minerai de datos/proyecto2" ##Depende del usuario
+setwd(ws)
+getwd()
+```
+
+```{r}
+getwd()
+tabla <- read.csv("datos/psu/inscritos2021.csv", as.is = FALSE, sep = ";", dec = ",")
+```
+
+```{r}
+##Librerías
+library(ggplot2)
+library(ggpubr)
+```
+
+###INTRODUCCIÓN
+
+**Durante este párrafo se explorarán los datos a nivel nacional, con la intención de resumir generalidades y tendencias que puedan existir.**
+
+##Exploración inicial
+
+```{r}
+dim(tabla)
+str(tabla)
+```
+
+```{r}
+length(is.na(tabla))
+```
+
+Se puede observar que:
+  - El dataset posee la información de 276059 estudiantes que rindieron la ptu durante el 2021.
+  - De esto existen 72 columnas con información asociada a la ptu, de esto se destaca que provee datos como género, edad, año de egreso, establecimiento de educación, código de dependencia del establecimiento, región, provincia y comuna de egreso, puntajes asociados a las pruebas rendidas, información asociada a las pruebas rendidas, rendimiento asociado al estudiante.
+  - Existen 19millones de entradas sin información que es necesario limpiar
+  
+
+##Exploración inicial de datos de interés
+
+A continuación se explorán los datos con la finalidad de encontrar información de interés para su posterior análisis y síntesis.
+
+```{r}
+fnacimiento<-c(tabla$FECHA_NACIMIENTO)/100
+hist(fnacimiento,xlim=c(1940,2010),breaks = 1000)
+```
+
+
+```{r}
+hist(tabla$COD_SEXO)
+```
+
+Como se puede apreciar, las inscritas superan en número a los inscrito notoriamente.
+
+
+```{r}
+hist(tabla$CODIGO_REGION_EGRESO)
+```
+
+La región con más inscritos es la región Metropolitana, en segunda posición la región de Valparaíso y en tercer lugar la región del BíoBío.
+
+```{r}
+hist(tabla$DEPENDENCIA)
+```
+
+La mayoría de los inscritos egresó de un colegio particular subvencionado, siendo seguida de una segunda mayoría de colegios municipales. Es necesario aclarar que tanto los colegios con código de dependecia 1 y 2 son colegios municipales.
+
+
+```{r}
+hist(tabla$CLEC_ACTUAL, main="Distribución de puntajes", xlab="Puntaje lenguaje", ylab="Frecuencia", type = "p", cex = 0.1)
+```
+
+```{r}
+hist(tabla$MATE_ACTUAL, main="Distribución de puntajes", xlab="Puntaje matemática", ylab="Frecuencia", type = "p", cex = 0.1)
+```
+
+
+##Exploración según dependencia del establecimiento
+
+Para evitar posibles problemas y errores durante la exploración se limpiarán las entradas que no posean información de puntajes en lenguaje o matemática.
+
+```{r}
+tabla<-tabla[!is.na(tabla$CLEC_ACTUAL),]
+tabla<-tabla[!is.na(tabla$MATE_ACTUAL),]
+tabla<-tabla[!is.na(tabla$DEPENDENCIA),]
+length(tabla$CLEC_ACTUAL)
+```
+
+Ahora solo exploraremos la información de 240mil inscritos.
+
+#Municipales
+
+```{r}
+##Resumen Municipal DAEM
+datomuni1 <- tabla[tabla$DEPENDENCIA==1,]
+length(datomuni1$CLEC_ACTUAL)
+summary(datomuni1$PTJE_RANKING)
+summary(datomuni1$MATE_ACTUAL)
+summary(datomuni1$CLEC_ACTUAL)
+
+```
+
+Como podemos apreciar: ...
+
+A continuación los gráficos de la distribución de puntajes de matemática y lenguaje, estos también indicarán el promedio con una recta roja y la mediana con una azul, esto con el fin de hacer visual las variaciones entre estadísticas que puedan existir.
+
+```{r}
+hist(datomuni1$MATE_ACTUAL, main="Distribución de puntajes", xlab="Puntaje matemática", ylab="Frecuencia")
+abline(v = mean(datomuni1$MATE_ACTUAL,na.rm=TRUE), col="red")
+abline(v = median(datomuni1$MATE_ACTUAL,na.rm=TRUE), col="blue")
+```
+
+```{r}
+hist(datomuni1$CLEC_ACTUAL, main="Distribución de puntajes", xlab="Puntaje lenguaje", ylab="Frecuencia")
+abline(v = mean(datomuni1$CLEC_ACTUAL,na.rm=TRUE), col="red")
+abline(v = median(datomuni1$CLEC_ACTUAL,na.rm=TRUE), col="blue")
+```
+
+
+```{r}
+##Resumen Municipal
+datomuni2 <- tabla[tabla$DEPENDENCIA==2,]
+length(datomuni2$CLEC_ACTUAL)
+summary(datomuni2$PTJE_RANKING)
+summary(datomuni2$MATE_ACTUAL)
+summary(datomuni2$CLEC_ACTUAL)
+```
+
+```{r}
+hist(datomuni2$MATE_ACTUAL, main="Distribución de puntajes", xlab="Puntaje matemática", ylab="Frecuencia")
+abline(v = mean(datomuni2$MATE_ACTUAL,na.rm=TRUE), col="red")
+abline(v = median(datomuni2$MATE_ACTUAL,na.rm=TRUE), col="blue")
+```
+
+```{r}
+hist(datomuni2$CLEC_ACTUAL, main="Distribución de puntajes", xlab="Puntaje lenguaje", ylab="Frecuencia")
+abline(v = mean(datomuni2$CLEC_ACTUAL,na.rm=TRUE), col="red")
+abline(v = median(datomuni2$CLEC_ACTUAL,na.rm=TRUE), col="blue")
+```
+
+
+#Particular Subvencionado
+```{r}
+##Resumen Particular Subvencionado
+datosub <- tabla[tabla$DEPENDENCIA==3,]
+length(datosub$CLEC_ACTUAL)
+summary(datosub$PTJE_RANKING)
+summary(datosub$MATE_ACTUAL)
+summary(datosub$CLEC_ACTUAL)
+```
+
+```{r}
+hist(datosub$MATE_ACTUAL, main="Distribución de puntajes", xlab="Puntaje matemática", ylab="Frecuencia")
+abline(v = mean(datosub$MATE_ACTUAL,na.rm=TRUE), col="red")
+abline(v = median(datosub$MATE_ACTUAL,na.rm=TRUE), col="blue")
+```
+
+```{r}
+hist(datosub$CLEC_ACTUAL, main="Distribución de puntajes", xlab="Puntaje lenguaje", ylab="Frecuencia")
+abline(v = mean(datosub$CLEC_ACTUAL,na.rm=TRUE), col="red")
+abline(v = median(datosub$CLEC_ACTUAL,na.rm=TRUE), col="blue")
+```
+
+#Particular Pagado
+
+```{r}
+##Resumen Particular Pagado
+datopriv <- tabla[tabla$DEPENDENCIA==4,]
+length(datopriv$CLEC_ACTUAL)
+summary(datopriv$PTJE_RANKING)
+summary(datopriv$MATE_ACTUAL)
+summary(datopriv$CLEC_ACTUAL)
+```
+
+```{r}
+hist(datopriv$MATE_ACTUAL, main="Distribución de puntajes", xlab="Puntaje matemática", ylab="Frecuencia")
+abline(v = mean(datopriv$MATE_ACTUAL,na.rm=TRUE), col="red")
+abline(v = median(datopriv$MATE_ACTUAL,na.rm=TRUE), col="blue")
+```
+
+```{r}
+hist(datopriv$CLEC_ACTUAL, main="Distribución de puntajes", xlab="Puntaje lenguaje", ylab="Frecuencia")
+abline(v = mean(datopriv$CLEC_ACTUAL,na.rm=TRUE), col="red")
+abline(v = median(datopriv$CLEC_ACTUAL,na.rm=TRUE), col="blue")
+```
+
+Como es posible apreciar en el resumen y en ambos gráficos, existe una fuerte diferencia con respecto al rendimiento de los inscritos que egresaron de un colegio municipal o subvencionado. Es importante destacar la mediana en los resultados de la prueba de matemática, que bordean los 600 puntos para este caso. Al menos 100 puntos por sobre el rendimiento de los inscritos que egresaron de colegios con otras dependencias.
+También es importante destacar las diferencias socioeconómicas asociadas a estos establecimientos.
+
+#CORP. Administración delegada
+
+```{r}
+datocorp <- tabla[tabla$DEPENDENCIA==5,]
+length(datocorp$CLEC_ACTUAL)
+summary(datocorp$PTJE_RANKING)
+summary(datocorp$MATE_ACTUAL)
+summary(datocorp$CLEC_ACTUAL)
+```
+
+```{r}
+hist(datocorp$MATE_ACTUAL, main="Distribución de puntajes", xlab="Puntaje matemática", ylab="Frecuencia")
+abline(v = mean(datocorp$MATE_ACTUAL,na.rm=TRUE), col="red")
+abline(v = median(datocorp$MATE_ACTUAL,na.rm=TRUE), col="blue")
+```
+
+```{r}
+hist(datocorp$CLEC_ACTUAL, main="Distribución de puntajes", xlab="Puntaje lenguaje", ylab="Frecuencia")
+abline(v = mean(datocorp$CLEC_ACTUAL,na.rm=TRUE), col="red")
+abline(v = median(datocorp$CLEC_ACTUAL,na.rm=TRUE), col="blue")
+```
+
+#Servicio Local de Educación
+
+```{r}
+datolocal <- tabla[tabla$DEPENDENCIA==6,]
+length(datolocal$CLEC_ACTUAL)
+summary(datolocal$PTJE_RANKING)
+summary(datolocal$MATE_ACTUAL)
+summary(datolocal$CLEC_ACTUAL)
+```
+
+```{r}
+hist(datolocal$MATE_ACTUAL, main="Distribución de puntajes", xlab="Puntaje matemática", ylab="Frecuencia")
+abline(v = mean(datolocal$MATE_ACTUAL,na.rm=TRUE), col="red")
+abline(v = median(datolocal$MATE_ACTUAL,na.rm=TRUE), col="blue")
+```
+
+```{r}
+hist(datolocal$CLEC_ACTUAL, main="Distribución de puntajes", xlab="Puntaje lenguaje", ylab="Frecuencia")
+abline(v = mean(datolocal$CLEC_ACTUAL,na.rm=TRUE), col="red")
+abline(v = median(datolocal$CLEC_ACTUAL,na.rm=TRUE), col="blue")
+```
+
+#Municiales, subvencionados y privados.
+
+```{r}
+boxplot(MATE_ACTUAL ~ DEPENDENCIA, tabla)
+```
+
+```{r}
+boxplot(CLEC_ACTUAL ~ DEPENDENCIA, tabla)
+```
+
+Los siguientes gráficos mostrarán medidas de tendencia central para establecimientos municipales en azul, subvencionados en verde y privados en rojo.
+
+Primero las medianas
+
+```{r}
+datosgenerales<-tabla[tabla$DEPENDENCIA<5,]
+hist(datosgenerales$MATE_ACTUAL, main="Distribución de puntajes", xlab="Puntaje matemática", ylab="Frecuencia")
+abline(v = median(tabla[tabla$DEPENDENCIA<3,]$MATE_ACTUAL,na.rm=TRUE), col="blue")
+abline(v = median(tabla[tabla$DEPENDENCIA==3,]$MATE_ACTUAL,na.rm= TRUE), col="green")
+abline(v = median(tabla[tabla$DEPENDENCIA==4,]$MATE_ACTUAL,na.rm= TRUE), col="red")
+```
+
+```{r}
+datosgenerales<-tabla[tabla$DEPENDENCIA<5,]
+hist(datosgenerales$CLEC_ACTUAL, main="Distribución de puntajes", xlab="Puntaje lenguaje", ylab="Frecuencia")
+abline(v = median(tabla[tabla$DEPENDENCIA<3,]$CLEC_ACTUAL,na.rm=TRUE), col="blue")
+abline(v = median(tabla[tabla$DEPENDENCIA==3,]$CLEC_ACTUAL,na.rm= TRUE), col="green")
+abline(v = median(tabla[tabla$DEPENDENCIA==4,]$CLEC_ACTUAL,na.rm= TRUE), col="red")
+```
+
+En los gráficos anteriores se puede observar el desplazamiento de la mediana del rendimiento de los inscritos según la dependencia de su establecimiento, el cual es notorio sobre todo en el caso de los establecimientos privados.
+
+Ahora se mostrará el desplazamiento de la media de los puntajes según el tipo de establecimiento.
+
+```{r}
+datosgenerales<-tabla[tabla$DEPENDENCIA<5,]
+hist(datosgenerales$MATE_ACTUAL, main="Distribución de puntajes", xlab="Puntaje matemática", ylab="Frecuencia")
+abline(v = mean(tabla[tabla$DEPENDENCIA<3,]$MATE_ACTUAL,na.rm=TRUE), col="blue")
+abline(v = mean(tabla[tabla$DEPENDENCIA==3,]$MATE_ACTUAL,na.rm= TRUE), col="green")
+abline(v = mean(tabla[tabla$DEPENDENCIA==4,]$MATE_ACTUAL,na.rm= TRUE), col="red")
+```
+
+```{r}
+datosgenerales<-tabla[tabla$DEPENDENCIA<5,]
+hist(datosgenerales$CLEC_ACTUAL, main="Distribución de puntajes", xlab="Puntaje lenguaje", ylab="Frecuencia")
+abline(v = mean(tabla[tabla$DEPENDENCIA<3,]$CLEC_ACTUAL,na.rm=TRUE), col="blue")
+abline(v = mean(tabla[tabla$DEPENDENCIA==3,]$CLEC_ACTUAL,na.rm= TRUE), col="green")
+abline(v = mean(tabla[tabla$DEPENDENCIA==4,]$CLEC_ACTUAL,na.rm= TRUE), col="red")
+```
+
+Nuevamente es notorio.
+
+```{r}
+datomuni<-tabla[tabla$DEPENDENCIA<2,]
+
+medianaprivMATE <- median(datopriv$MATE_ACTUAL) ##600 puntos
+datomuniVSPRIV<-datomuni[datomuni$MATE_ACTUAL>medianaprivMATE,]
+datosubVSPRIV<-datosub[datosub$MATE_ACTUAL>medianaprivMATE,]
+
+length(datomuniVSPRIV$MATE_ACTUAL)
+length(datosubVSPRIV$MATE_ACTUAL)
+
+length(datomuniVSPRIV$MATE_ACTUAL)/length(datomuni$MATE_ACTUAL)
+length(datosubVSPRIV$MATE_ACTUAL)/length(datosub$MATE_ACTUAL)
+```
+
+Los primeros datos representan la cantidad de inscritos que obtienen un puntaje por sobre la mediana del puntaje de los inscritos que egresaron de un establecimiento privado.
+
+Los datos subsiguientes muestran la frecuencia con la que esto es así, la frecuencia está determinada por la cantidad / cantidad total.
+
+Se puede observar que la frecuencia con la que estudiantes de establecimientos municipales y subvencionados superan el estándar de rendimiento, de al menos, el 50% de los inscritos provenientes de colegios privados es del 11.7% y 14.1% respectivamente.
+
+```{r}
+datomuni650MATE<-datomuni[datomuni$MATE_ACTUAL>650,]
+datosub650MATE<-datosub[datosub$MATE_ACTUAL>650,]
+datopriv650MATE<-datopriv[datopriv$MATE_ACTUAL>650,]
+
+length(datomuni650MATE$MATE_ACTUAL)
+length(datosub650MATE$MATE_ACTUAL)
+length(datopriv650MATE$MATE_ACTUAL)
+
+length(datomuni650MATE$MATE_ACTUAL)/length(datomuni$MATE_ACTUAL)
+length(datosub650MATE$MATE_ACTUAL)/length(datosub$MATE_ACTUAL)
+length(datopriv650MATE$MATE_ACTUAL)/length(datopriv$MATE_ACTUAL)
+```
+
+Se puede observar que la frecuencia con la que los inscritos obtienen un mínimo de 650 puntos la prueba de matemáticas es 6 veces superior a la frecuencia con la que inscritos, provenientes
+
+```{r}
+datomuni700MATE<-datomuni[datomuni$MATE_ACTUAL>700,]
+datosub700MATE<-datosub[datosub$MATE_ACTUAL>700,]
+datopriv700MATE<-datopriv[datopriv$MATE_ACTUAL>700,]
+
+length(datomuni700MATE$MATE_ACTUAL)
+length(datosub700MATE$MATE_ACTUAL)
+length(datopriv700MATE$MATE_ACTUAL)
+
+length(datomuni700MATE$MATE_ACTUAL)/length(datomuni$MATE_ACTUAL)
+length(datosub700MATE$MATE_ACTUAL)/length(datosub$MATE_ACTUAL)
+length(datopriv700MATE$MATE_ACTUAL)/length(datopriv$MATE_ACTUAL)
+```
+
+La frecuencia con la que los inscritos egresados de un establecimiento particular logran obtener al menos 700 puntos en la ptu de matemáticas es 12 veces mayor a la frecuencia con la que inscritos provenientes de establecimientos municipales lo lo logran.
+
+```{r}
+medianaprivCLEC <- median(datopriv$CLEC_ACTUAL) ##600 puntos
+datomuniVSPRIV<-datomuni[datomuni$CLEC_ACTUAL>medianaprivCLEC,]
+datosubVSPRIV<-datosub[datosub$CLEC_ACTUAL>medianaprivCLEC,]
+
+length(datomuniVSPRIV$CLEC_ACTUAL)
+length(datosubVSPRIV$CLEC_ACTUAL)
+
+length(datomuniVSPRIV$CLEC_ACTUAL)/length(datomuni$CLEC_ACTUAL)
+length(datosubVSPRIV$CLEC_ACTUAL)/length(datosub$CLEC_ACTUAL)
+```
+
+...
+
+
+```{r}
+datomuni650CLEC<-datomuni[datomuni$CLEC_ACTUAL>650,]
+datosub650CLEC<-datosub[datosub$CLEC_ACTUAL>650,]
+datopriv650CLEC<-datopriv[datopriv$CLEC_ACTUAL>650,]
+
+length(datomuni650CLEC$CLEC_ACTUAL)
+length(datosub650CLEC$CLEC_ACTUAL)
+length(datopriv650CLEC$CLEC_ACTUAL)
+
+length(datomuni650CLEC$MATE_ACTUAL)/length(datomuni$CLEC_ACTUAL)
+length(datosub650CLEC$MATE_ACTUAL)/length(datosub$CLEC_ACTUAL)
+length(datopriv650CLEC$MATE_ACTUAL)/length(datopriv$CLEC_ACTUAL)
+```
+
+...
+
+```{r}
+datomuni700CLEC<-datomuni[datomuni$CLEC_ACTUAL>700,]
+datosub700CLEC<-datosub[datosub$CLEC_ACTUAL>700,]
+datopriv700CLEC<-datopriv[datopriv$CLEC_ACTUAL>700,]
+
+length(datomuni700CLEC$CLEC_ACTUAL)
+length(datosub700CLEC$CLEC_ACTUAL)
+length(datopriv700CLEC$CLEC_ACTUAL)
+
+length(datomuni700CLEC$MATE_ACTUAL)/length(datomuni$CLEC_ACTUAL)
+length(datosub700CLEC$MATE_ACTUAL)/length(datosub$CLEC_ACTUAL)
+length(datopriv700CLEC$MATE_ACTUAL)/length(datopriv$CLEC_ACTUAL)
+```
+
+...
+
+```{r}
+datomunipost<-datomuni[datomuni$PROM_CM_ACTUAL<475,]
+datosubpost<-datosub[datosub$PROM_CM_ACTUAL<475,]
+datoprivpost<-datopriv[datopriv$PROM_CM_ACTUAL<475,]
+
+length(datomunipost$PROM_CM_ACTUAL)
+length(datosubpost$PROM_CM_ACTUAL)
+length(datoprivpost$PROM_CM_ACTUAL)
+
+length(datomunipost$PROM_CM_ACTUAL)/length(datomuni$PROM_CM_ACTUAL)
+length(datosubpost$PROM_CM_ACTUAL)/length(datosub$PROM_CM_ACTUAL)
+length(datoprivpost$PROM_CM_ACTUAL)/length(datopriv$PROM_CM_ACTUAL)
+```
+
+Un 53% de inscritos provenientes de municipales no podrían postular a una carrera universitaria en una universidad adscrita al CRUCH. En el caso de los inscritos egresados de un establecimiento subvencionado fue del 44%.
+
+Para el caso de los inscritos egresados de colegios privados fue de un 18%.
+
+* Es buena idea visualizar esta información
+
+## Rendimiento vs geografía
+
+Se limpiarán los datos para evitar posibles problemas
+
+```{r}
+tabla<-tabla[!is.na(tabla$CODIGO_REGION_EGRESO),]
+```
+
+```{r}
+meanMATE<-c()
+for(i in 1:16){
+  dataregion<-tabla[tabla$CODIGO_REGION_EGRESO == i,]
+  print(paste0("Region:", i))
+  print("Resumen CLEC: ")
+  print(summary(dataregion$CLEC_ACTUAL))
+  print("Resumen MATE: ")
+  print(summary(dataregion$MATE_ACTUAL))
+  print("----------------------------------")
+}
+```
+
+```{r}
+boxplot(MATE_ACTUAL ~ CODIGO_REGION_EGRESO, tabla)
+```
+
+```{r}
+boxplot(CLEC_ACTUAL ~ CODIGO_REGION_EGRESO, tabla)
+```
+
+
