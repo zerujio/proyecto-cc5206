@@ -1,0 +1,159 @@
+---
+title: "esoprofes"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+Seteamos el espacio de trabajo
+```{r}
+ws = "/Users/catalaxis/Documents/Minerai de datos/proyecto2" ##Depende del usuario
+setwd(ws)
+getwd()
+```
+Importamos el dataset
+```{r}
+getwd()
+tabla <- read.csv("datos/evalua/evalua.csv", as.is = FALSE, sep = ";", dec = ",")
+```
+
+## Exploración inicial
+
+1.- Primero un breve resumen de las dimensiones del dataset, qué contiene y un resumen de las medidas de tendencia central.
+
+```{r}
+dim(tabla)
+```
+
+```{r}
+str(tabla)
+```
+
+```{r}
+summary(tabla)
+```
+
+```{r}
+length(unique(tabla$COD_PRO_RBD))
+```
+
+```{r}
+length(unique(tabla$COD_COM_RBD))
+```
+
+```{r}
+length(unique(tabla$RBD))
+```
+
+De todo se observa que:
+- El dataset posee 21197 entradas y 22 columnas.
+- Estas 22 columnas nos indican información de los establecimientos a los cuales pertenecen los docentes, localización, tipo de establecimiento, género del docente, el puntaje obtenido y demases.
+- El máximo puntaje obtenido en la evaluación docente es de 3.850, mientras que el mínimo es -1.
+- 
+
+## Estadísticas
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+plot(tabla$INSTR_PJE, main="Distribución de puntajes", xlab="Docente", ylab="Puntaje Final", type = "p", cex = 0.1)
+```
+- Se observa que no existen entradas con puntajes entre -1 y 1.
+
+```{r}
+tabnooutliers<-tabla[tabla$INSTR_PJE>0,]
+plot(tabnooutliers$INSTR_PJE, main="Distribución de puntajes", xlab="Docente", ylab="Puntaje Final", type = "p", cex = 0.1)
+```
+
+```{r}
+hist(tabnooutliers$PF_PJE, main = "Distribución de puntaje portafolio", ylab = "Frecuencia", xlab = "Puntaje Portafolio")
+```
+
+```{r}
+plot(PF_PJE ~ PF_ESC, tabnooutliers, main = "Escala Portafolio según Puntaje Portafolio", ylab = "Puntaje Portafolio", xlab = "Escala")
+```
+
+```{r}
+plot(tabnooutliers$PF_ESC, main = "Distribución de escala de portafolio", ylab = "Frecuencia", xlab = "Escala Portafolio")
+```
+
+
+
+### Resumen según tipo de establecimiento
+
+Cantidad de docentes evaluados según tipo de establecimiento y medidas de tendencia central para puntaje portafolio de docentes, según el tipo de establecimiento:
+
+* Establecimientos municiples
+```{r}
+datamun<-tabla[tabla$COD_DEPE2==1,]
+dim(datamun)[1]
+summary(datamun$PF_PJE)
+sd(datamun$PF_PJE)
+```
+
+* Establecimientos particular subvencionados
+```{r}
+datasub<-tabla[tabla$COD_DEPE2==2,]
+dim(datasub)[1]
+summary(datasub$PF_PJE)
+sd(datasub$PF_PJE)
+```
+
+* Establecimientos particular pagados
+```{r}
+datapp<-tabla[tabla$COD_DEPE2==3,]
+dim(datapp)[1]
+summary(datapp$PF_PJE)
+```
+
+* Establecimientos Corporación Corporación de Administración delegada
+```{r}
+dataccpd<-tabla[tabla$COD_DEPE2==4,]
+dim(dataccpd)[1]
+summary(dataccpd$PF_PJE)
+sd(dataccpd$PF_PJE)
+```
+
+* Establecimientos Servicio Local de Educación
+```{r}
+datasle<-tabla[tabla$COD_DEPE2==5,]
+dim(datasle)[1]
+summary(datasle$PF_PJE)
+sd(datasle$PF_PJE)
+```
+
+### Resumen según localidad
+
+```{r}
+library(crayon)
+for(i in 1:16){
+dataregion<-tabla[tabla$COD_REG_RBD==i,]
+b = as.character(i)
+cat(blue("********************************"))
+print("")
+print(c("REGIÓN NÚMERO", i))
+print(dim(dataregion)[1])
+print(summary(dataregion$PF_PJE))
+print(c("Desviación estándar:", sd(dataregion$PF_PJE)))
+}
+```
+
+```{r}
+boxplot(PF_PJE ~ COD_REG_RBD, tabnooutliers, main = "Docentes", ylab = "Puntaje Portafolio", xlab = "Región")
+```
+
+```{r}
+boxplot(PF_PJE ~ RURAL_RBD, tabnooutliers, main = "Docentes", ylab = "Puntaje Portafolio", xlab = "0 -> Urbano, 1 -> Rural")
+```
+
+```{r}
+boxplot(PF_PJE ~ COD_DEPE2, tabnooutliers, main = "Docentes", ylab = "Puntaje Portafolio", xlab = "Tipo establecimiento")
+```
+
+
