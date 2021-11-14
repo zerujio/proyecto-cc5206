@@ -228,7 +228,3 @@ El promedio general de quienes estudian en la misma comuna en la que viven parec
 Al examinar el dataset se hace evidente que muchas variables no tienen el poder predictivo que se esperaba. Las diferencias más marcadas se dan en relación a la ubicación geográfica y el código de dependencia. Creemos que esto se debe a que los sistemas de evaluación utilizados por los colegios no están estandarizados mucho más allá de la escala de notas y los contenidos a pasar. Hay una multiplicidad de variables que afectan la forma en que los colegios evalúan a sus alumnos, por lo que las notas son poco comparables entre alumnos de colegios distintos. En consecuencia, es evidente que es necesario añadir datos que sean comparables entre colegios, o bien, derivar tales variables a partir de los atributos ya existentes. Por ejemplo, se puede considerar la distribución de notas de los colegios y tomar en cuenta la posición del alumno en relación a sus compañeros. 
 
 Es necesario, entonces, buscar relaciones más complejas entre las variables. Al comparar promedios una variable a la vez se hace difícil observar tendencias. Por tanto, nos interesa utilizar algoritmos de clustering para determinar si existen combinaciones de variables que generen grupos de alumnos con rendimiento escolar similar. En general, del análisis de datos como los resultados de la PSU se observa que en Chile existe esta segregación, y nos interesa determinar si es posible identificarlos con los datos disponibles en este dataset.
-
-
-
-
