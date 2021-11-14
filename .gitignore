@@ -44,3 +44,6 @@ datos/
 # Notebook ml
 *.nb.html
 *.html
+
+# jupyter
+.ipynb_checkpoints/
