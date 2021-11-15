@@ -413,6 +413,35 @@ Para el caso de los inscritos egresados de colegios privados fue de un 18%.
 
 * Es buena idea visualizar esta información
 
+
+Preguntas correctas según dependencia
+
+```{r}
+##Matemática
+print("Correctas:")
+round(mean(tabla[tabla$DEPENDENCIA<3,]$CORRECTAS_MATE),1)
+round(mean(tabla[tabla$DEPENDENCIA==3,]$CORRECTAS_MATE),1)
+round(mean(tabla[tabla$DEPENDENCIA==4,]$CORRECTAS_MATE),1)
+
+print("Erradas:")
+round(mean(tabla[tabla$DEPENDENCIA<3,]$ERRADAS_MATE),1)
+round(mean(tabla[tabla$DEPENDENCIA==3,]$ERRADAS_MATE),1)
+round(mean(tabla[tabla$DEPENDENCIA==4,]$ERRADAS_MATE),1)
+```
+
+```{r}
+##Lenguaje
+print("Correctas")
+round(mean(tabla[tabla$DEPENDENCIA<3,]$CORRECTAS_CL),1)
+round(mean(tabla[tabla$DEPENDENCIA==3,]$CORRECTAS_CL),1)
+round(mean(tabla[tabla$DEPENDENCIA==4,]$CORRECTAS_CL),1)
+
+print("Erradas")
+round(mean(tabla[tabla$DEPENDENCIA<3,]$ERRADAS_CL),1)
+round(mean(tabla[tabla$DEPENDENCIA==3,]$ERRADAS_CL),1)
+round(mean(tabla[tabla$DEPENDENCIA==4,]$ERRADAS_CL),1)
+```
+
 ## Rendimiento vs geografía
 
 Se limpiarán los datos para evitar posibles problemas
@@ -442,4 +471,51 @@ boxplot(MATE_ACTUAL ~ CODIGO_REGION_EGRESO, tabla)
 boxplot(CLEC_ACTUAL ~ CODIGO_REGION_EGRESO, tabla)
 ```
 
+```{r}
+boxplot(MATE_ACTUAL ~ CODIGO_REGION_EGRESO, tabla[tabla$DEPENDENCIA < 3,])
+```
 
+```{r}
+boxplot(CLEC_ACTUAL ~ CODIGO_REGION_EGRESO, tabla[tabla$DEPENDENCIA < 3,])
+```
+
+```{r}
+boxplot(MATE_ACTUAL ~ CODIGO_REGION_EGRESO, tabla[tabla$DEPENDENCIA == 3,])
+```
+
+```{r}
+boxplot(CLEC_ACTUAL ~ CODIGO_REGION_EGRESO, tabla[tabla$DEPENDENCIA == 3,])
+```
+
+```{r}
+boxplot(MATE_ACTUAL ~ CODIGO_REGION_EGRESO, tabla[tabla$DEPENDENCIA == 4,])
+```
+
+```{r}
+boxplot(CLEC_ACTUAL ~ CODIGO_REGION_EGRESO, tabla[tabla$DEPENDENCIA == 4,])
+```
+
+```{r}
+boxplot(PTJE_RANKING ~ CODIGO_REGION_EGRESO, tabla)
+```
+
+```{r}
+boxplot(PTJE_NEM ~ CODIGO_REGION_EGRESO, tabla)
+```
+
+```{r}
+freq475 <- tabla[tabla$PROM_CM_ACTUAL < 475,]
+hist(freq475$CODIGO_REGION_EGRESO)
+```
+
+```{r}
+freq475 <- tabla[tabla$PROM_CM_ACTUAL < 475,]
+fc <- c()
+for(i in 1:16){
+  fregion475 <- length(freq475[freq475$CODIGO_REGION_EGRESO == i,]$CODIGO_REGION_EGRESO)/length(tabla[tabla$CODIGO_REGION_EGRESO == i,]$CODIGO_REGION_EGRESO)
+  fc<-append(fc, round(fregion475,3))
+  print(paste0(freq475[freq475$CODIGO_REGION_EGRESO == i,]$NOMBRE_REGION_EGRESO[1], ": ", fc[i]))
+}
+```
+
+Se puede observar que en las regiones de Tarapacá, Atacama, la Araucanía, Los Ríos y de Arica y Parinacota al menos un 50% de los inscritos no podrá postular a carreras universitarias n ues adscritas al CRUCH
